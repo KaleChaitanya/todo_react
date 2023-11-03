@@ -1,59 +1,133 @@
-import React from 'react'
-import todo from '../images/todo.svg'
+import React from "react";
+import todo from "../images/todo.svg";
+import { useEffect } from "react";
 
-const Todo = () => {
+// Get all the todos from localStorage
+const getTodosFromLocalStorage = () => {
+  let list = localStorage.getItem("List");
 
-    const [todos, setTodos] = React.useState('');
-    const [todoArray, setTodoArray] = React.useState([]);
+  if (list) {
+    return JSON.parse(localStorage.getItem("List"));
+  } else {
+    return [];
+  }
+};
 
-    const addTodo = () => {
-        if (!todos) {
+const Todo = (props) => {
+  const [todos, setTodos] = React.useState("");
+  const [todoArray, setTodoArray] = React.useState(getTodosFromLocalStorage());
+  const [toggleSubmit, setToggleSubmit] = React.useState(true);
+  const [isEditItem, setIsEditItem] = React.useState(null);
 
-        } else {
-            setTodoArray([...todoArray, todos]);
-            setTodos('')
-        }
-    }
-
-    const deleteTodo = (id) => {
-        const updatesTodos = todoArray.filter((currEl, index) => {
-            return index !== id;
+  const addTodo = () => {
+    if (!todos) {
+      props.showAlert("Please write todos", "danger");
+    } else if (todos && !toggleSubmit) {
+      setTodoArray(
+        todoArray.map((elem) => {
+          if (elem.id === isEditItem) {
+            return { ...elem, name: todos };
+          }
+          return elem;
         })
-        setTodoArray(updatesTodos)
+      );
+      setToggleSubmit(true);
+      setTodos("");
+      setIsEditItem(null);
+      props.showAlert("Todo update successfully", "success");
+    } else {
+      const allInputData = {
+        //Generate id using date function
+        id: new Date().getTime().toString(),
+        name: todos,
+      };
+      setTodoArray([...todoArray, allInputData]);
+      setTodos("");
+      props.showAlert("Todo add successfully", "success");
     }
+  };
 
-    const removeAll = () => {
-        setTodoArray([])
-    }
+  const deleteTodo = (id) => {
+    const updatesTodos = todoArray.filter((currEl) => {
+      return id !== currEl.id;
+    });
+    setTodoArray(updatesTodos);
+    props.showAlert("Todo delete successfully", "success");
+  };
 
-    return (
-        <div className='main--container'>
-            <div className='child--container'>
-                <figure>
-                    <img src={todo} alt='todoLogo' className='todoLogo' />
-                    <figcaption>Add Your todo Here</figcaption>
-                </figure>
-                <div className='add--todo'>
-                    <input type='text' value={todos} placeholder='Add todo' onChange={(e) => setTodos(e.target.value)} />
-                    <button onClick={addTodo}>+</button>
-                </div>
-                {
-                    todoArray.map((currEl, index) => {
-                        return (
-                            <div className='todo--list' key={index}>
-                                <h3>{currEl}<span onClick={() => deleteTodo(index)}>         (Delete)</span></h3>
-                            </div>
-                        )
-                    })
-                }
+  const removeAll = () => {
+    setTodoArray([]);
+    props.showAlert("All Todos deleted successfully", "success");
+  };
 
-                <div className='delete--todos'>
-                    <button onClick={removeAll}>Remove All</button>
-                </div>
-            </div>
+  const edit = (id) => {
+    let newEditItem = todoArray.find((elem) => {
+      return elem.id === id;
+    });
 
+    setToggleSubmit(false);
+    setTodos(newEditItem.name);
+    setIsEditItem(id);
+  };
+  // Store todo item into localStorage
+  useEffect(() => {
+    localStorage.setItem("List", JSON.stringify(todoArray));
+  }, [todoArray]);
+
+  return (
+    <div className="container">
+      <figure>
+        <img
+          src={todo}
+          alt="todoLogo"
+          className="rounded mx-auto d-block todoLogo"
+        />
+        <figcaption className="caption">Add Your todo Here</figcaption>
+      </figure>
+      <div className="add--todo">
+        <input
+          type="text"
+          value={todos}
+          placeholder="Add todo"
+          onChange={(e) => setTodos(e.target.value)}
+        />
+        {toggleSubmit ? (
+          <i className="fa fa-plus fa-fw" onClick={addTodo}></i>
+        ) : (
+          <i className="fa fa-edit fa-fw" onClick={addTodo}></i>
+        )}
+      </div>
+      {todoArray.map((currEl) => {
+        return (
+          <div className="row" key={currEl.id}>
+            <div className="col-md-2"></div>
+            <h3 className="col-md-8">
+              {currEl.name}
+              <i
+                className="fa fa-trash fa-fw"
+                onClick={() => deleteTodo(currEl.id)}
+              ></i>
+              <i
+                className="fa fa-edit fa-fw"
+                onClick={() => edit(currEl.id)}
+              ></i>
+            </h3>
+            <div className="col-md-2"></div>
+          </div>
+        );
+      })}
+
+      <div className="row">
+        <div className="col-md-4"></div>
+        <div className="col-md-4">
+          <button className="removeAll btn btn-primary" onClick={removeAll}>
+            Remove All
+          </button>
         </div>
-    )
-}
+        <div className="col-md-4"></div>
+      </div>
+    </div>
+  );
+};
 
-export default Todo
+export default Todo;
