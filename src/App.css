@@ -14,7 +14,6 @@
   --font-color: #86efac;
 }
 body {
-  background-color: var(--background-color);
   color: var(--font-color);
   font-weight: bolder;
 }
@@ -30,12 +29,13 @@ body {
 .container {
   margin: 5rem auto;
   width: 50%;
-  /* border: 2px solid var(--border-color); */
+  border: 2px solid var(--border-color);
   /* background-color: aqua; */
   border-radius: 1rem;
 }
 .todoLogo {
   margin: 0.5rem 0.5rem;
+  padding: 0.5rem 0.5rem;
   width: 100px;
   height: 100px;
   background-color: var(--font-color);
