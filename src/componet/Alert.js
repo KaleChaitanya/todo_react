@@ -1,7 +1,6 @@
 import React from 'react'
 
 const Alert = (props) => {
-    console.log(props.alert)
     return (
         <div className='alert--msg'>
             {props.alert &&

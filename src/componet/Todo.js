@@ -75,7 +75,14 @@ const Todo = (props) => {
   }, [todoArray]);
 
   return (
-    <div className="container">
+    <div
+      className="container"
+      style={{
+        color: props.mode === "light" ? "black" : "white",
+        border:
+          props.mode === "light" ? "3px solid black" : "3px solid #4ade80",
+      }}
+    >
       <figure>
         <img
           src={todo}
@@ -90,6 +97,9 @@ const Todo = (props) => {
           value={todos}
           placeholder="Add todo"
           onChange={(e) => setTodos(e.target.value)}
+          style={{
+            border: props.mode === "light" ? "2px solid black" : "none",
+          }}
         />
         {toggleSubmit ? (
           <i className="fa fa-plus fa-fw" onClick={addTodo}></i>
